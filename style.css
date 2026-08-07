@@ -1,0 +1,108 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+
+/* Центрування всього контенту на екрані */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #e9ecef;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* Картка з контентом */
+.container {
+    background-color: #ffffff;
+    width: 100%;
+    max-width: 400px;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    text-align: center; /* Центруємо заголовки */
+    box-sizing: border-box;
+}
+
+h1 {
+    color: #2b2b2b;
+    margin-bottom: 5px;
+    margin-top: 0;
+}
+
+h2 {
+    color: #6c757d;
+    font-size: 18px;
+    margin-bottom: 25px;
+    margin-top: 0;
+}
+
+/* Форми */
+form {
+    display: flex;
+    flex-direction: column;
+    text-align: left; /* Текст підписів залишаємо зліва для зручності читання */
+}
+
+label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 5px;
+    margin-top: 15px;
+}
+
+input, select {
+    padding: 12px;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    font-size: 15px;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+/* Анімація при кліку на поле вводу */
+input:focus, select:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+
+/* Головна кнопка */
+.btn {
+    margin-top: 25px;
+    padding: 14px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    text-decoration: none;
+    display: block;
+    text-align: center;
+}
+
+.btn:hover {
+    background-color: #2980b9;
+}
+
+/* Другорядна кнопка (для повернення) */
+.btn-secondary {
+    background-color: #f8f9fa;
+    color: #495057;
+    border: 1px solid #ced4da;
+    margin-top: 15px;
+}
+
+.btn-secondary:hover {
+    background-color: #e2e6ea;
+}
+
+/* Меню для головної сторінки */
+.menu {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
