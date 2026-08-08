@@ -1,6 +1,7 @@
 import socket
 import re#GET /UpdatPR HTTP/1.1
 import json
+impot time
 
 #create a socket
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -85,13 +86,35 @@ while True:
             if request == "add-pr" or request == "login" or request == "update-profile":
                 body = separate_body(c_data)
                 if body:
-                    oby_body = body_to_object(body)
-                    print(f"===Parsed JSON body: {oby_body}===\n")
-                    database = json_file_to_object()
-                    database.append(oby_body)
-                    python_object_to_json_file(database)
+                    try:
+                        oby_body = body_to_object(body)
+                        #print(f"===Parsed JSON body: {oby_body}===\n")
+                        #database = json_file_to_object()
+                        #database.append(oby_body)
+                        #python_object_to_json_file(database)
+                        if request == "login":
+                            # Handle login logic here
+                            with open("database.txt", "r", encoding="utf-8") as f:
+                                user_found = False
+                                database = json.load(f)
+                                for user in database:
+                                    if user.get("username") == oby_body.get("username") and user.get("password") == oby_body.get("password"):
+                                        active_users.append([client_address, user.get("username"), "loged_in", time.time()])
+                                        with open("home.html", "r", encoding="utf-8") as home_file:
+                                            home_content = home_file.read()
+                                            client_socket.sendall(f"HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n{home_content}".encode("utf-8"))
+                                        user_found = True
+                                        break
+                                if not user_found:
+                                    active_users.append([client_address, None, "loging_in", time.time()])
+                                    with open("UpdateProfile.html", "r", encoding="utf-8") as update_file:
+                                            update_content = update_file.read()
+                                            client_socket.sendall(f"HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n{update_content}".encode("utf-8"))
+
+                    except json.JSONDecodeError:
+                        print("Error: Invalid JSON in request body.")
             
-            client_socket.sendall(b"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nHello, World!")
+            #client_socket.sendall(b"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nHello, World!")
         
         client_socket.close()
 
