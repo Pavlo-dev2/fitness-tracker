@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
 
-/* Центрування всього контенту на екрані */
+/* Container styles */
 body {
     font-family: 'Inter', sans-serif;
     background-color: #e9ecef;
@@ -11,7 +11,7 @@ body {
     min-height: 100vh;
 }
 
-/* Картка з контентом */
+/* Container */
 .container {
     background-color: #ffffff;
     width: 100%;
@@ -36,7 +36,7 @@ h2 {
     margin-top: 0;
 }
 
-/* Форми */
+/* Form styles */
 form {
     display: flex;
     flex-direction: column;
@@ -60,14 +60,14 @@ input, select {
     box-sizing: border-box;
 }
 
-/* Анімація при кліку на поле вводу */
+/* Focus states */
 input:focus, select:focus {
     outline: none;
     border-color: #3498db;
     box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
 }
 
-/* Головна кнопка */
+/* Main button */
 .btn {
     margin-top: 25px;
     padding: 14px;
@@ -88,7 +88,7 @@ input:focus, select:focus {
     background-color: #2980b9;
 }
 
-/* Другорядна кнопка (для повернення) */
+/* Go home button */
 .btn-secondary {
     background-color: #f8f9fa;
     color: #495057;
@@ -100,9 +100,14 @@ input:focus, select:focus {
     background-color: #e2e6ea;
 }
 
-/* Меню для головної сторінки */
+/* Home page menu */
 .menu {
     display: flex;
     flex-direction: column;
     gap: 15px;
+}
+
+/* Error messages */
+.error {
+    color: #e61e08;
 }
