@@ -1,5 +1,5 @@
 import socket
-import re#GET /UpdatPR HTTP/1.1
+import re
 import json
 import time
 import sys
@@ -76,7 +76,7 @@ def python_object_to_json_file(oby):
         f.seek(0)
         f.write(text)
 
-#check if user is in database
+#check if the user is in database and if the password is correct, return True if it is, False if it isn't
 def check_user_in_database(username, password, database):
     if username == None or password == None:
         return False
@@ -90,6 +90,7 @@ def check_user_in_database(username, password, database):
             break
     return False
 
+#check if user is in database
 def check_user_exists(username, database):
     if username == None:
         return False
@@ -104,6 +105,7 @@ def send_html_response(client_socket, html_file):
         content = f.read()
         send_response(client_socket, "200 OK", "text/html", content)
 
+#send a response to the client with the given status code, content type and content
 def send_response(client_socket, status_code, content_type, content):
     print(content)
     client_socket.sendall(f"HTTP/1.1 {status_code}\r\nContent-Type: {content_type}\r\n\r\n{content}".encode("utf-8"))
@@ -119,11 +121,13 @@ def add_line_to_html_response(flile_path, line_to_add, position):
     #print(text)
     return text
 
+#open the database and return it as a python object
 def open_database():
     with open("database.txt", "r", encoding="utf-8") as f:
         database = json.load(f)
         return database
 
+#add a user to the database, the user_dict is a dictionary with the user information
 def add_user_to_database(user_dict):
     database = open_database()
     object_to_add = {
@@ -165,7 +169,10 @@ class user:
 active_users = []
 
 #main loop to accept connections and handle requests
-
+#no request - send login page
+#request = login - check if user is in database and if password is correct, send home page if it is, send login page with error message if it isn't
+#request = create-account - send create account page
+#request = register - check if user is in database, if it is send login page with error message, if it isn't add user to database and send home page
 def main():
     s.listen(1)
     while True:
@@ -176,7 +183,8 @@ def main():
             c_data = get_all_data(client_socket)
 
             if ifcss(c_data, client_socket, client_address) == 0 and iffavicon(c_data, client_socket, client_address) == 0:
-                print(f"Received data:\n{c_data}")        
+                print(f"Received data:\n{c_data}")
+                #separate the request from the data        
                 request = separate_request(c_data)
 
                 #Handle the request with no body, like login or create account, and send the appropriate page
@@ -185,7 +193,8 @@ def main():
                 if not request:
                     send_html_response(client_socket, "Login.html")
                     continue
-                elif request == "create-account":#send the create account page
+                #send the create account page
+                elif request == "create-account":
                     # Handle registration logic here
                     send_html_response(client_socket, "CreateAcount.html")
                 
@@ -194,42 +203,47 @@ def main():
                     body = separate_body(c_data)
                     if body:
                         try:
-                            oby_body = body_to_object(body)#request body as python object
-                            database = open_database()#database as python object
+                            #request body as python object
+                            oby_body = body_to_object(body)
+                            #database as python object
+                            database = open_database()
                             
                             #process the request based on the request type
                             if request == "login":
                                 # Handle login logic here
                                 if oby_body.get("username") and oby_body.get("password"):#check if request body has username and password
-                                    print(oby_body)
+                                    #check if user is in database and if password is correct
                                     if check_user_in_database(oby_body.get("username"), oby_body.get("password"), database) == True:
                                         send_html_response(client_socket, "home.html")
+                                    #send login page with error message if user is not in database or password is incorrect
                                     elif check_user_in_database(oby_body.get("username"), oby_body.get("password"), database) == False:
                                         response_content = add_line_to_html_response("Login.html", "<h2 class=\"error-message\">Wrong Username or Password</h2>\n", 12)
                                         send_response(client_socket, "200 OK", "text/html", response_content)
 
-                            elif request == "register":#register the user, handel the data fo new user and save it to the database
-                                if oby_body.get("username") and oby_body.get("password") and oby_body.get("confirm_password") and oby_body.get("email") and oby_body.get("birthdate") and oby_body.get("gender"):#check if request body has username and password and confirm password and birthdate and email and gender
+                            elif request == "register":#register the user, handel the data for new user and save it to the database
+                                #check if request body has all information: username and password and confirm password and birthdate and email and gender
+                                if oby_body.get("username") and oby_body.get("password") and oby_body.get("confirm_password") and oby_body.get("email") and oby_body.get("birthdate") and oby_body.get("gender"):
                                     
-                                    if (not check_user_exists(oby_body.get("username"), database)):
-                                        
+                                    #register the user if they don't exist in the database, otherwise send them to the login page
+                                    if (not check_user_exists(oby_body.get("username"), database)): 
+                                        #check if the password and confirm password match, if they don't send the user to the create account page with an error message
                                         if oby_body.get("password") != oby_body.get("confirm_password") or oby_body.get("confirm_password") == None:
                                             response_content = add_line_to_html_response("CreateAcount.html", "<h2 class=\"error-message\">Passwords do not match</h2>\n", 12)
                                             send_response(client_socket, "200 OK", "text/html", response_content)
                                             continue
                                         
+                                        #add the user to the database and send them to the home page
                                         database = json_file_to_object()
-                                        oby_body.pop("confirm_password")####work hier, remove the confirm password from the body before saving it to the database
+                                        oby_body.pop("confirm_password")
                                         add_user_to_database(oby_body)
                                         send_html_response(client_socket, "home.html")
                                 else:
-                                    send_html_response(client_socket, "Login.html")#user already exists, send them to the login page
+                                    #user already exists, send them to the login page
+                                    send_html_response(client_socket, "Login.html")
 
                         except json.JSONDecodeError:
                             print("Error: Invalid JSON in request body.")
-                
-                #client_socket.sendall(b"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nHello, World!")
-            
+
             client_socket.close()
 
         except socket.timeout:
