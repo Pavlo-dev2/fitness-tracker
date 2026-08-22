@@ -6,6 +6,7 @@ import sys
 import os
 import file
 import databaselib
+import user
 
 #create a socket
 def create_socket():
@@ -85,34 +86,6 @@ def add_line_to_html_response(flile_path, line_to_add, position):
     text = "\n".join(lines)
     #print(text)
     return text
-
-#the user class is used to create a user object that can be used to store user information and send it to the database
-class user:
-    type = "user"
-    def __init__(self, ip_address=None, username=None, email=None, password=None, number_in_database=None, status="passive", timestamp=time.time(), age=None, gender=None):
-        self.ip_address = ip_address
-        self.number_in_database = number_in_database
-        self.username = username
-        self.password = password
-        self.email = email
-        self.status = status
-        self.timestamp = timestamp
-        self.age = age
-        self.gender = gender
-    
-    def fill_info(self, username, database):
-        number_in_database = 0
-        for user_list_object in database:
-            if user_list_object.get("username") == username:
-                self.age = user_list_object.get("age")
-                self.gender = user_list_object.get("gender")
-                self.email = user_list_object.get("email")
-                self.password = user_list_object.get("password")
-                self.number_in_database = number_in_database
-            number_in_database += 1
-
-#list to keep track of active users
-active_users = []
 
 #main loop to accept connections and handle requests
 #no request - send login page
