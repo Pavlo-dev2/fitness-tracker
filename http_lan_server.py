@@ -93,10 +93,17 @@ def add_line_to_html_response(flile_path, line_to_add, position):
 #request = create-account - send create account page
 #request = register - check if user is in database, if it is send login page with error message, if it isn't add user to database and send home page
 def main():
+    #database as python object
+    database = databaselib.open_database()
     s.listen(1)
     while True:
+        #remove users from the active users list that have been there for a certain amount of 4.5 min
+        user.remove_timeout_users()
+        user.print_active_users()
+
         client_socket, client_address = s.accept()
         try:
+            print(user.active_users)
             client_socket.settimeout(10.0)
             print(f"Connection from {client_address} has been established!")
             c_data = get_all_data(client_socket)
@@ -124,8 +131,6 @@ def main():
                         try:
                             #request body as python object
                             oby_body = body_to_object(body)
-                            #database as python object
-                            database = databaselib.open_database()
                             
                             #process the request based on the request type
                             if request == "login":
@@ -133,6 +138,9 @@ def main():
                                 if oby_body.get("username") and oby_body.get("password"):#check if request body has username and password
                                     #check if user is in database and if password is correct
                                     if databaselib.check_user_in_database(oby_body.get("username"), oby_body.get("password"), database) == True:
+
+                                        #add the user to the active users list and send them to the home page
+                                        user.add_user_to_active_users(client_address, oby_body.get("username"), database)
                                         send_html_response(client_socket, "home.html")
                                     #send login page with error message if user is not in database or password is incorrect
                                     elif databaselib.check_user_in_database(oby_body.get("username"), oby_body.get("password"), database) == False:
@@ -152,10 +160,12 @@ def main():
                                             send_response(client_socket, "200 OK", "text/html", response_content)
                                             continue
                                         
-                                        #add the user to the database and send them to the home page
-                                        database = databaselib.open_database()
+                                        #add the user to the database
                                         oby_body.pop("confirm_password")
-                                        databaselib.add_user_to_database(oby_body)
+                                        database = databaselib.add_user_to_database(oby_body, database)
+
+                                        #add the user to the active users list and send them to the home page
+                                        user.add_user_to_active_users(client_address, oby_body.get("username"), database)
                                         send_html_response(client_socket, "home.html")
                                         continue
                                     else:
@@ -176,6 +186,7 @@ def main():
         except socket.timeout:
             print(f"Connection from {client_address} timed out.")
             client_socket.close()
+
 
     print("Server stopped.")
     s.close()

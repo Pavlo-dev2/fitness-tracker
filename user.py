@@ -1,3 +1,5 @@
+import time
+
 #list to keep track of active users
 global active_users
 active_users = []
@@ -16,6 +18,7 @@ class user:
         self.age = age
         self.gender = gender
     
+    #fill user information
     def fill_info(self, username, database):
         number_in_database = 0
         for user_list_object in database:
@@ -26,6 +29,17 @@ class user:
                 self.password = user_list_object.get("password")
                 self.number_in_database = number_in_database
             number_in_database += 1
+    
+    #print the information of the user object
+    def print_info(self):
+        print("IP Address: " + str(self.ip_address))
+        print("Username: " + str(self.username))
+        print("Email: " + str(self.email))
+        print("Password: " + str(self.password))
+        print("Status: " + str(self.status))
+        print("Timestamp: " + str(self.timestamp))
+        print("Age: " + str(self.age))
+        print("Gender: " + str(self.gender))
 
 #add a user to the active users list, the user is a user object, fill the information of the user object with the information from the database
 def add_user_to_active_users(ip_address, username, database):
@@ -44,3 +58,8 @@ def remove_timeout_users(waiting_time=450):
     for user in active_users:
         if time.time() - user.timestamp > waiting_time:
             active_users.remove(user)
+
+#print the information of all active users
+def print_active_users():
+    for user in active_users:
+        user.print_info()

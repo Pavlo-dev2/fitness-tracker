@@ -7,8 +7,9 @@ def open_database():
     return json.loads(databasetext)
 
 #add a user to the database, the user_dict is a dictionary with the user information
-def add_user_to_database(user_dict):
-    database = open_database()
+def add_user_to_database(user_dict, database=None):
+    if database is None:
+        database = open_database()
     object_to_add = {
         "username": user_dict.get("username"),
         "email": user_dict.get("email"),
@@ -18,6 +19,7 @@ def add_user_to_database(user_dict):
     }
     database.append(object_to_add)
     file.write_python_object_to_json_file(database)
+    return database
 
 #check if user is in database
 def check_user_exists(username, database):
