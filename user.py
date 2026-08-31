@@ -7,13 +7,12 @@ active_users = []
 #the user class is used to create a user object that can be used to store user information and send it to the database
 class user:
     type = "user"
-    def __init__(self, ip_address=None, username=None, email=None, password=None, number_in_database=None, status="passive", timestamp=time.time(), age=None, gender=None):
+    def __init__(self, ip_address=None, username=None, email=None, password=None, number_in_database=None, timestamp=time.time(), age=None, gender=None):
         self.ip_address = ip_address
         self.number_in_database = number_in_database
         self.username = username
         self.password = password
         self.email = email
-        self.status = status
         self.timestamp = timestamp
         self.age = age
         self.gender = gender
@@ -36,7 +35,6 @@ class user:
         print("Username: " + str(self.username))
         print("Email: " + str(self.email))
         print("Password: " + str(self.password))
-        print("Status: " + str(self.status))
         print("Timestamp: " + str(self.timestamp))
         print("Age: " + str(self.age))
         print("Gender: " + str(self.gender))
@@ -63,3 +61,16 @@ def remove_timeout_users(waiting_time=450):
 def print_active_users():
     for user in active_users:
         user.print_info()
+
+#check if user is active and authenticated using ip address
+def check_user_in_active_users(ip_address=None):
+    for user in active_users:
+        print(f"\n######\n{str(user.ip_address), str(ip_address)}\n######\n")
+        if (user.ip_address == ip_address and ip_address != None):
+            return True
+    return False
+
+def update_user_timestapm(ip_address):
+    for user in active_users:
+        if (user.ip_address == ip_address and ip_address != None):
+            user.timestamp = time.time()

@@ -30,8 +30,8 @@ def ifcss(data, cl_socket, client_address = None):
         style_content = file.returnfiletext("style.css", encoding="utf-8")
         cl_socket.sendall((f"HTTP/1.1 200 OK\r\nContent-Type: text/css\r\n\r\n{style_content}").encode("utf-8"))
         print(f"\n===Sent style.css to {client_address}===\n")
-        return 1
-    return 0
+        return True
+    return False
 
 #check if the request is for favicon.ico and send a 404 response if it is
 def iffavicon(data, cl_socket, client_address = None):
@@ -39,8 +39,8 @@ def iffavicon(data, cl_socket, client_address = None):
     if "favicon.ico" in data:
         cl_socket.sendall(b"HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\n\r\nFavicon not found.")
         print(f"\n===Sent favicon.ico not found message to {client_address}===\n")
-        return 1
-    return 0
+        return True
+    return False
 
 #separate the request from the data
 def separate_request(data):
@@ -74,7 +74,7 @@ def send_html_response(client_socket, html_file):
 
 #send a response to the client with the given status code, content type and content
 def send_response(client_socket, status_code, content_type, content):
-    print(content)
+    #print(content)
     client_socket.sendall(f"HTTP/1.1 {status_code}\r\nContent-Type: {content_type}\r\n\r\n{content}".encode("utf-8"))
     client_socket.close()
 
@@ -92,6 +92,7 @@ def add_line_to_html_response(flile_path, line_to_add, position):
 #request = login - check if user is in database and if password is correct, send home page if it is, send login page with error message if it isn't
 #request = create-account - send create account page
 #request = register - check if user is in database, if it is send login page with error message, if it isn't add user to database and send home page
+#request = update-profile-page - check if user is logged in and send UpdateProfile page
 def main():
     #database as python object
     database = databaselib.open_database()
@@ -103,13 +104,11 @@ def main():
 
         client_socket, client_address = s.accept()
         try:
-            print(user.active_users)
             client_socket.settimeout(10.0)
             print(f"Connection from {client_address} has been established!")
             c_data = get_all_data(client_socket)
 
-            if ifcss(c_data, client_socket, client_address) == 0 and iffavicon(c_data, client_socket, client_address) == 0:
-                print(f"Received data:\n{c_data}")
+            if ifcss(c_data, client_socket, client_address) == False and iffavicon(c_data, client_socket, client_address) == False:
                 #separate the request from the data        
                 request = separate_request(c_data)
 
@@ -123,6 +122,14 @@ def main():
                 elif request == "create-account":
                     # Handle registration logic here
                     send_html_response(client_socket, "CreateAcount.html")
+                    continue
+                #check is user is logged in and send UpdateProfile page
+                elif request == "update-profile-page":
+                    if user.check_user_in_active_users(client_address[0]):
+                        send_html_response(client_socket, "UpdateProfile.html")
+                        user.update_user_timestapm(client_address[0])
+                    else:
+                        send_html_response(client_socket, "Login.html")
                 
                 #process the request
                 if request == "add-pr" or request == "login" or request == "update-profile" or request == "register":
@@ -140,7 +147,7 @@ def main():
                                     if databaselib.check_user_in_database(oby_body.get("username"), oby_body.get("password"), database) == True:
 
                                         #add the user to the active users list and send them to the home page
-                                        user.add_user_to_active_users(client_address, oby_body.get("username"), database)
+                                        user.add_user_to_active_users(client_address[0], oby_body.get("username"), database)
                                         send_html_response(client_socket, "home.html")
                                     #send login page with error message if user is not in database or password is incorrect
                                     elif databaselib.check_user_in_database(oby_body.get("username"), oby_body.get("password"), database) == False:
@@ -165,7 +172,7 @@ def main():
                                         database = databaselib.add_user_to_database(oby_body, database)
 
                                         #add the user to the active users list and send them to the home page
-                                        user.add_user_to_active_users(client_address, oby_body.get("username"), database)
+                                        user.add_user_to_active_users(client_address[0], oby_body.get("username"), database)
                                         send_html_response(client_socket, "home.html")
                                         continue
                                     else:
@@ -177,6 +184,10 @@ def main():
                                 #if request body does not have all information, send the user to the login page with an error message
                                 response_content = add_line_to_html_response("Login.html", "<h2 class=\"error-message\">Invalid request</h2>\n", 12)
                                 send_response(client_socket, "200 OK", "text/html", response_content)
+                            
+                            #handle update profile request
+                            elif request == "update-profile":
+                                pass#TODO
 
                         except json.JSONDecodeError:
                             print("Error: Invalid JSON in request body.")
