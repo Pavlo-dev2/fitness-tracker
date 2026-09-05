@@ -1,2 +1,2 @@
-Web service to track your sports and fitness performance
-The project is still under development
+<h1>Web service to track your sports and fitness performance</h1>
+<h2>The project is still under development</h2>
