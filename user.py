@@ -70,7 +70,15 @@ def check_user_in_active_users(ip_address=None):
             return True
     return False
 
+#update user last activity time
 def update_user_timestapm(ip_address):
     for user in active_users:
         if (user.ip_address == ip_address and ip_address != None):
             user.timestamp = time.time()
+
+#find user from active users using ip
+def find_user_ip(ip_address):
+    for user in active_users:
+        if (user.ip_address == ip_address and ip_address != None):
+            return user
+

@@ -1,3 +1,4 @@
+check if username is already taken
 open and close database text file ones
 use sorting and search in database and active_user
 add other authentication method instead of just ip check

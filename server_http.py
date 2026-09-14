@@ -93,6 +93,7 @@ def add_line_to_html_response(flile_path, line_to_add, position):
 #request = create-account - send create account page
 #request = register - check if user is in database, if it is send login page with error message, if it isn't add user to database and send home page
 #request = update-profile-page - check if user is logged in and send UpdateProfile page
+#request = update-profile - update user profile and send UpdateProfile page
 def main():
     #database as python object
     database = databaselib.open_database()
@@ -187,7 +188,10 @@ def main():
                             
                             #handle update profile request
                             elif request == "update-profile":
-                                pass#TODO
+                                if user.check_user_in_active_users(client_address[0]):
+                                    #TODO check if there is difference, update user info
+                                else:
+                                    send_html_response(client_socket, "Login.html")
 
                         except json.JSONDecodeError:
                             print("Error: Invalid JSON in request body.")
