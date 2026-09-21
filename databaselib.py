@@ -43,3 +43,14 @@ def check_user_in_database(username, password, database):
                 return True
             break
     return False
+
+def update_user_in_database(old_username, new_username, new_password, database):
+    for user in database:
+        if user.get("username") == old_username:
+            if new_username:
+                user["username"] = new_username
+            if new_password:
+                user["password"] = new_password
+            file.write_python_object_to_json_file(database)
+            return True
+    return False

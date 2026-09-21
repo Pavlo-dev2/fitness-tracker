@@ -1,1 +1,1 @@
-[]
+[{"username": "Pavlo", "email": "pavlokudil2%40gmail.com", "password": "1234", "birthdate": "2009-09-30", "gender": "M"}]

@@ -13,7 +13,7 @@ def create_socket():
     print(sys.platform)
     global s
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.bind(("192.168.178.27", 80))
+    s.bind((input("Enter host: "), 80))
 
 #get all data from the client
 def get_all_data(client_socket):
@@ -189,7 +189,20 @@ def main():
                             #handle update profile request
                             elif request == "update-profile":
                                 if user.check_user_in_active_users(client_address[0]):
-                                    #TODO check if there is difference, update user info
+                                    user.update_user_timestapm(client_address[0])
+                                    usr = user.find_user_ip(client_address[0])
+                                    old_username = usr.username
+                                    print(f"\n===   ===UPDATE PROFILE===    ===\n")
+                                    #check if there is difference, update user info
+                                    
+                                    if oby_body.get("username") and usr.username != oby_body.get("username"):
+                                        usr.username = oby_body.get("username")
+                                    
+                                    if oby_body.get("password") and oby_body.get("confirm_password") and usr.password != oby_body.get("password"):
+                                        if oby_body.get("password") == oby_body.get("confirm_password"):
+                                            usr.password = oby_body.get("password")
+                                    databaselib.update_user_in_database(old_username, usr.username, usr.password, database)
+                                    send_html_response(client_socket, "home.html")
                                 else:
                                     send_html_response(client_socket, "Login.html")
 
