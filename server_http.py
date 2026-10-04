@@ -195,11 +195,12 @@ def main():
                                     print(f"\n===   ===UPDATE PROFILE===    ===\n")
                                     #check if there is difference, update user info
                                     
-                                    if oby_body.get("username") and usr.username != oby_body.get("username"):
+                                    if oby_body.get("username") != None and usr.username != oby_body.get("username"):
                                         usr.username = oby_body.get("username")
                                     
-                                    if oby_body.get("password") and oby_body.get("confirm_password") and usr.password != oby_body.get("password"):
+                                    if oby_body.get("password") != None and oby_body.get("confirm_password") != None:
                                         if oby_body.get("password") == oby_body.get("confirm_password"):
+                                            print("Updating password")
                                             usr.password = oby_body.get("password")
                                     databaselib.update_user_in_database(old_username, usr.username, usr.password, database)
                                     send_html_response(client_socket, "home.html")

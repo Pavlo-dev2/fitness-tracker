@@ -45,6 +45,7 @@ def check_user_in_database(username, password, database):
     return False
 
 def update_user_in_database(old_username, new_username, new_password, database):
+    print("Updating user", new_password)
     for user in database:
         if user.get("username") == old_username:
             if new_username:
